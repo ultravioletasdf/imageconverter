@@ -1,6 +1,6 @@
 FROM golang:1.22.2
 
-RUN apt update && apt install -y nodejs npm
+RUN apt update && apt install -y nodejs npm libvips-dev libvips
 
 WORKDIR /app
 
