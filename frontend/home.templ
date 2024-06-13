@@ -1,0 +1,79 @@
+package frontend
+
+templ Page() {
+	<!DOCTYPE html>
+	<html class="h-full" lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<link rel="stylesheet" href="/assets/styles.css"/>
+			<title>Image Convertor</title>
+			<script src="/assets/htmx.js"></script>
+		</head>
+		<body class="flex justify-center items-center h-full">
+			{ children... }
+		</body>
+	</html>
+}
+
+templ HomePage() {
+	@Page() {
+		<form hx-post="/convert" hx-target="#output" hx-encoding="multipart/form-data" hx-indicator="#convert-button" hx-indicator-class="flex" class="flex flex-col gap-2 p-8 w-full h-full rounded-lg bg-base-100 md:w-2/3 md:h-5/6">
+			<h1 class="text-2xl font-bold">Image Convertor</h1>
+			<div>Upload a file:</div>
+			<input name="file" type="file" accept="image/*" class="file-input file-input-bordered w-full"/>
+			Convert to:
+			<select name="type" id="typeselect" class="select select-bordered w-full">
+				<option selected>PNG</option>
+				<option>WEBP</option>
+				<option>JPEG</option>
+				<option>AVIF</option>
+				<option>TIFF</option>
+			</select>
+			<button disabled id="convert-button" class="btn btn-block btn-primary">
+				<div id="content" class="flex gap-2 items-center">
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z"></path>
+					</svg>
+					Convert!
+				</div>
+				<div id="spinner" class="hidden">
+					<svg class="animate-spin -ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+						<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+						<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+					</svg>
+				</div>
+			</button>
+			<div id="output" class="mt-2 w-full flex flex-col items-center gap-2"></div>
+		</form>
+	}
+	<script>
+		const fileInput = document.querySelector("input[name=\"file\"]")
+		const select = document.querySelector('#typeselect')
+		const output = document.querySelector("#output")
+		const button = document.querySelector("#convert-button")
+
+		fileInput.value = ""
+
+		select.addEventListener("change", () => {
+			output.innerHTML = ""
+		})
+		fileInput.addEventListener("change", () => {
+			if (fileInput.files.length == 1) {
+				button.disabled = false
+			} else {
+				button.disabled = true
+			}
+		})
+	</script>
+}
+
+templ ImagePreview(data string) {
+	<img class="rounded-md bg-base-100 max-h-96 w-auto" src={ data } alt="Failed to load"/>
+	<a href={ templ.SafeURL(data) } download class="btn">
+		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+			<path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"></path>
+		</svg>
+		Download
+	</a>
+}

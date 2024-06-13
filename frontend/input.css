@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#convert-button.htmx-request {
+  #content {
+    display: none;
+  }
+  #spinner {
+    display: block;
+  }
+}
